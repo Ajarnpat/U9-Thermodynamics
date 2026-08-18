@@ -1,0 +1,65 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>3. Molecular Speed Distributions</title><style>
+:root{
+  --bg:#07111f; --panel:#0d1b2a; --panel2:#10243a; --ink:#edf6ff; --muted:#9db3c7;
+  --accent:#5de1d0; --accent2:#72a7ff; --warn:#ffcc66; --hot:#ff7b69; --cold:#73b7ff;
+  --line:rgba(255,255,255,.12); --shadow:0 18px 55px rgba(0,0,0,.32);
+}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;background:var(--bg);color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;overflow:hidden}
+body{background:radial-gradient(circle at 20% -10%,#153454 0,transparent 42%),linear-gradient(180deg,#07111f,#081625 55%,#07111f)}
+.app{height:100vh;display:grid;grid-template-rows:58px minmax(0,1fr)}
+header{display:flex;align-items:center;justify-content:space-between;padding:0 18px;border-bottom:1px solid var(--line);background:rgba(5,14,25,.78);backdrop-filter:blur(10px)}
+.brand{display:flex;align-items:center;gap:12px;min-width:0}.dot{width:11px;height:11px;border-radius:50%;background:var(--accent);box-shadow:0 0 18px var(--accent)}
+h1{font-size:18px;margin:0;font-weight:700;letter-spacing:.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.sub{font-size:12px;color:var(--muted);margin-left:10px;font-weight:500}
+header .actions{display:flex;gap:8px}
+button,select,input{font:inherit}
+button{border:1px solid var(--line);background:#132740;color:var(--ink);border-radius:10px;padding:8px 11px;cursor:pointer;transition:.15s}
+button:hover{transform:translateY(-1px);border-color:rgba(93,225,208,.5)}button.primary{background:linear-gradient(135deg,#16776d,#1b4f73);border-color:rgba(93,225,208,.45)}button.ghost{background:transparent}
+.main{min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:12px;padding:12px}
+.stage,.side{min-height:0;border:1px solid var(--line);border-radius:18px;background:linear-gradient(180deg,rgba(18,39,63,.96),rgba(10,25,42,.96));box-shadow:var(--shadow);overflow:hidden}
+.stage{position:relative;display:flex;min-width:0}.stage canvas{width:100%;height:100%;display:block}
+.side{padding:14px;overflow:auto;scrollbar-width:thin}.side h2{font-size:13px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin:2px 0 10px}.control{margin:11px 0 15px}.control label{display:flex;justify-content:space-between;gap:10px;font-size:13px;margin-bottom:6px}.control .value{color:var(--accent);font-variant-numeric:tabular-nums}.control input[type=range]{width:100%;accent-color:#5de1d0}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:8px}.row3{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.readouts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}.readout{padding:10px;border:1px solid var(--line);border-radius:12px;background:rgba(4,14,25,.38)}.readout .k{font-size:11px;color:var(--muted)}.readout .v{font-size:18px;font-weight:750;margin-top:2px;font-variant-numeric:tabular-nums}.readout .u{font-size:10px;color:var(--muted);margin-left:2px}
+.note{font-size:12px;line-height:1.45;color:#bed0df;border-left:3px solid rgba(93,225,208,.45);padding:8px 10px;background:rgba(93,225,208,.06);border-radius:0 10px 10px 0;margin-top:10px}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:11px}.tabs button.active{background:#1d5b6d;border-color:#58d7c8}
+.equation{font-family:"Cambria Math",Cambria,Georgia,serif;text-align:center;font-size:18px;padding:9px;border-radius:12px;background:rgba(0,0,0,.2);border:1px solid var(--line);margin:10px 0}
+.legend{position:absolute;left:14px;bottom:12px;display:flex;gap:10px;flex-wrap:wrap;font-size:11px;color:#c7d6e3;background:rgba(4,12,22,.62);border:1px solid var(--line);border-radius:10px;padding:7px 9px;backdrop-filter:blur(6px)}
+.pill{display:inline-flex;align-items:center;gap:6px}.sw{width:8px;height:8px;border-radius:50%}
+.help{position:fixed;inset:70px 24px 24px;z-index:20;background:rgba(7,17,31,.96);border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:var(--shadow);display:none;overflow:auto}.help.show{display:block}.help h3{margin-top:0}.help p,.help li{color:#c6d7e5;line-height:1.55}.help .close{position:absolute;right:14px;top:14px}
+.small{font-size:11px;color:var(--muted)}
+@media(max-width:900px){html,body{overflow:auto}.app{height:auto;min-height:100vh}.main{grid-template-columns:1fr;grid-template-rows:62vh auto}.side{overflow:visible}.sub{display:none}}
+</style></head>
+<body><div class="app"><header><div class="brand"><span class="dot"></span><h1>3. Molecular Speed Distributions<span class="sub">AP Physics 2 - Unit 9</span></h1></div><div class="actions"><button class="ghost" data-help>How to use</button><button id="resetBtn">Reset</button></div></header>
+<div class="main"><section class="stage"><canvas id="c"></canvas></section><aside class="side"><h2>Speed distribution</h2><div class="control"><label>Temperature <span class="value" id="tOut"></span></label><input id="temp" type="range" min="100" max="900" value="300" step="20"></div>
+<div class="control"><label>Sample size <span class="value" id="nOut"></span></label><input id="num" type="range" min="50" max="400" value="220" step="10"></div><div class="readouts"><div class="readout"><div class="k">Mean speed</div><div class="v" id="meanRead">-</div></div><div class="readout"><div class="k">rms speed</div><div class="v" id="rmsRead">-</div></div></div><div class="row"><button id="resample" class="primary">Resample</button><button id="pauseBtn">Pause motion</button></div><div class="note">Do not look for a single 'molecular speed'. A gas contains a broad distribution of speeds, and the distribution changes with temperature.</div></aside></div></div>
+<div class="help"><button class="close" data-close>Close</button><div class="content"></div></div>
+<script>
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+document.querySelectorAll('[id]').forEach(el=>{if(!(el.id in window)) window[el.id]=el;});
+const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
+const lerp=(a,b,t)=>a+(b-a)*t;
+const fmt=(x,d=1)=>Number(x).toFixed(d);
+function setupCanvas(id='c'){
+ const c=document.getElementById(id),ctx=c.getContext('2d');
+ function resize(){const r=c.getBoundingClientRect(),d=window.devicePixelRatio||1;c.width=Math.round(r.width*d);c.height=Math.round(r.height*d);ctx.setTransform(d,0,0,d,0,0)}
+ window.addEventListener('resize',resize);resize();return [c,ctx];
+}
+function rounded(ctx,x,y,w,h,r){ctx.beginPath();ctx.roundRect(x,y,w,h,r)}
+function grid(ctx,x,y,w,h,nx=6,ny=5){ctx.save();ctx.strokeStyle='rgba(255,255,255,.08)';ctx.lineWidth=1;for(let i=0;i<=nx;i++){let xx=x+w*i/nx;ctx.beginPath();ctx.moveTo(xx,y);ctx.lineTo(xx,y+h);ctx.stroke()}for(let j=0;j<=ny;j++){let yy=y+h*j/ny;ctx.beginPath();ctx.moveTo(x,yy);ctx.lineTo(x+w,yy);ctx.stroke()}ctx.restore()}
+function axis(ctx,x,y,w,h,xlab,ylab){grid(ctx,x,y,w,h);ctx.strokeStyle='rgba(255,255,255,.35)';ctx.beginPath();ctx.moveTo(x,y+h);ctx.lineTo(x+w,y+h);ctx.moveTo(x,y);ctx.lineTo(x,y+h);ctx.stroke();ctx.fillStyle='#9db3c7';ctx.font='11px system-ui';ctx.fillText(xlab,x+w-24,y+h-8);ctx.save();ctx.translate(x+10,y+24);ctx.rotate(-Math.PI/2);ctx.fillText(ylab,0,0);ctx.restore()}
+function linePlot(ctx,pts,x,y,w,h,xmin,xmax,ymin,ymax,color='#5de1d0',width=2){if(!pts.length)return;ctx.save();ctx.strokeStyle=color;ctx.lineWidth=width;ctx.beginPath();pts.forEach((p,i)=>{let xx=x+(p[0]-xmin)/(xmax-xmin)*w,yy=y+h-(p[1]-ymin)/(ymax-ymin)*h;i?ctx.lineTo(xx,yy):ctx.moveTo(xx,yy)});ctx.stroke();ctx.restore()}
+function circle(ctx,x,y,r,fill){ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fillStyle=fill;ctx.fill()}
+function bindRange(id,out,fn,unit=''){const el=document.getElementById(id),o=document.getElementById(out);const go=()=>{o.textContent=fn?fn(+el.value):el.value+(unit?` ${unit}`:'')};el.addEventListener('input',go);go();return el}
+function helpText(html){document.querySelector('.help .content').innerHTML=html}
+document.addEventListener('click',e=>{if(e.target.matches('[data-help]'))document.querySelector('.help').classList.add('show');if(e.target.matches('[data-close]'))document.querySelector('.help').classList.remove('show')});
+
+helpText('<h3>Molecular-speed distributions</h3><p>Compare the shape and position of the histogram at several temperatures. Resample at the same temperature to see ordinary statistical variation.</p><p>AP Physics 2 requires a qualitative understanding of how the distribution changes, not the functional form of the Maxwell-Boltzmann equation.</p>');
+
+const [c,ctx]=setupCanvas();const kb=1.380649e-23,m=4.65e-26;let ps=[],paused=false,last=performance.now();const temp=bindRange('temp','tOut',x=>x+' K'),num=bindRange('num','nOut',x=>x+' particles');
+function gauss(){let u=0,v=0;while(!u)u=Math.random();while(!v)v=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v)}
+function sample(){ps=[];let sigma=Math.sqrt(kb*(+temp.value)/m),N=+num.value;for(let i=0;i<N;i++){let vx=gauss()*sigma,vy=gauss()*sigma,vz=gauss()*sigma;ps.push({x:Math.random(),y:Math.random(),vx,vy,vz,s:Math.sqrt(vx*vx+vy*vy+vz*vz)})}}
+[temp,num].forEach(e=>e.onchange=sample);resample.onclick=sample;pauseBtn.onclick=()=>{paused=!paused;pauseBtn.textContent=paused?'Resume motion':'Pause motion'};resetBtn.onclick=()=>{temp.value=300;num.value=220;temp.dispatchEvent(new Event('input'));num.dispatchEvent(new Event('input'));sample()};
+function frame(now){let dt=Math.min(.04,(now-last)/1000);last=now,w=c.clientWidth,h=c.clientHeight;ctx.clearRect(0,0,w,h);let topH=Math.max(170,h*.46),x=40,y=65,bw=w-80,bh=topH-75;rounded(ctx,x,y,bw,bh,16);ctx.fillStyle='rgba(4,12,22,.42)';ctx.fill();ctx.strokeStyle='rgba(255,255,255,.25)';ctx.stroke();if(!paused)for(const p of ps){let k=.0006;p.x+=p.vx*k*dt;p.y+=p.vy*k*dt;if(p.x<0||p.x>1){p.vx*=-1;p.x=clamp(p.x,0,1)}if(p.y<0||p.y>1){p.vy*=-1;p.y=clamp(p.y,0,1)}}for(const p of ps.slice(0,160))circle(ctx,x+8+p.x*(bw-16),y+8+p.y*(bh-16),2.6,'#78dcca');
+let gx=55,gy=topH+18,gw=w-110,gh=h-topH-55;axis(ctx,gx,gy,gw,gh,'speed','count');let bins=24,maxV=1800,counts=Array(bins).fill(0);for(const p of ps){let b=Math.floor(p.s/maxV*bins);if(b>=0&&b<bins)counts[b]++}let mc=Math.max(...counts,1);for(let i=0;i<bins;i++){let barH=counts[i]/mc*(gh-18);ctx.fillStyle='rgba(93,225,208,.68)';ctx.fillRect(gx+i*gw/bins+2,gy+gh-barH-1,gw/bins-4,barH)}let mean=ps.reduce((a,p)=>a+p.s,0)/ps.length,rms=Math.sqrt(ps.reduce((a,p)=>a+p.s*p.s,0)/ps.length);meanRead.textContent=Math.round(mean)+' m/s';rmsRead.textContent=Math.round(rms)+' m/s';ctx.fillStyle='#edf6ff';ctx.font='700 22px system-ui';ctx.fillText('A gas has a distribution of molecular speeds',40,36);requestAnimationFrame(frame)}sample();requestAnimationFrame(frame);
+</script></body></html>

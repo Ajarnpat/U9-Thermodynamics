@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#071421">
+<title>Thermodynamics | AP Physics 2 Unit 9 | Pat Roby</title>
+<style>
+:root{
+  --bg:#06111c;
+  --bg2:#0b1e31;
+  --panel:rgba(10,25,41,.86);
+  --panel-strong:rgba(9,23,38,.96);
+  --line:rgba(216,235,250,.13);
+  --line-strong:rgba(121,226,214,.46);
+  --ink:#f3f8fd;
+  --muted:#a9bfd3;
+  --cyan:#79e2d6;
+  --blue:#71b9ff;
+  --hot:#ff816d;
+  --warm:#ffc66d;
+  --shadow:0 22px 60px rgba(0,0,0,.34);
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--ink);background:var(--bg)}
+body{min-height:100vh;overflow-x:hidden;background:
+  radial-gradient(950px 620px at -5% 20%, rgba(91,171,255,.18), transparent 62%),
+  radial-gradient(850px 560px at 105% 12%, rgba(255,111,86,.17), transparent 58%),
+  radial-gradient(850px 520px at 60% 115%, rgba(88,223,205,.10), transparent 58%),
+  linear-gradient(145deg,#05101a 0%,#071827 46%,#0b1d30 100%)}
+body::before{
+  content:"";position:fixed;inset:0;pointer-events:none;opacity:.72;
+  background-image:
+    radial-gradient(circle,rgba(121,226,214,.34) 0 1.5px,transparent 1.8px),
+    radial-gradient(circle,rgba(113,185,255,.24) 0 1.2px,transparent 1.6px),
+    radial-gradient(circle,rgba(255,129,109,.25) 0 1.5px,transparent 1.9px);
+  background-size:150px 150px,205px 205px,255px 255px;
+  background-position:12px 22px,62px 100px,120px 32px;
+}
+body::after{
+  content:"";position:fixed;inset:0;pointer-events:none;
+  background:linear-gradient(90deg,transparent 49.92%,rgba(255,255,255,.018) 50%,transparent 50.08%),
+             linear-gradient(0deg,transparent 49.92%,rgba(255,255,255,.014) 50%,transparent 50.08%);
+  background-size:110px 110px;mask-image:linear-gradient(to bottom,rgba(0,0,0,.5),transparent 78%);
+}
+.app{position:relative;z-index:1;max-width:1580px;margin:0 auto;min-height:100vh;padding:18px;display:grid;grid-template-rows:auto 1fr auto;gap:14px}
+.topbar{border:1px solid var(--line);border-radius:25px;background:linear-gradient(135deg,rgba(11,30,50,.95),rgba(7,19,32,.93));box-shadow:var(--shadow);padding:18px 20px;position:relative;overflow:hidden}
+.topbar::after{content:"";position:absolute;right:-40px;top:-90px;width:390px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(255,129,109,.16),rgba(113,185,255,.08) 42%,transparent 70%);filter:blur(4px);pointer-events:none}
+.topgrid{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:18px;align-items:center}
+.brand{display:flex;gap:17px;align-items:center;min-width:0}
+.logo{width:68px;height:68px;flex:0 0 68px;border-radius:19px;border:1px solid rgba(255,255,255,.14);background:linear-gradient(145deg,rgba(113,185,255,.15),rgba(255,129,109,.12));display:grid;place-items:center;box-shadow:inset 0 0 24px rgba(255,255,255,.035)}
+.logo svg{width:52px;height:52px}
+.eyebrow{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--cyan);font-weight:800;margin-bottom:4px}
+h1{font-size:clamp(2rem,3.2vw,3.3rem);line-height:.96;margin:0;letter-spacing:-.035em}
+.sub{margin:7px 0 0;color:#d4e2ef;font-size:14px;line-height:1.45;max-width:780px}
+.actions{display:flex;gap:9px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+a.btn,button.btn{appearance:none;border:1px solid var(--line);text-decoration:none;color:var(--ink);background:rgba(255,255,255,.045);border-radius:13px;padding:11px 14px;font:inherit;font-size:13px;font-weight:750;cursor:pointer;transition:.17s;white-space:nowrap}
+a.btn:hover,button.btn:hover{transform:translateY(-1px);border-color:rgba(121,226,214,.42);background:rgba(255,255,255,.075)}
+a.btn.primary{border-color:rgba(121,226,214,.34);background:linear-gradient(135deg,rgba(30,139,126,.92),rgba(39,96,151,.92))}
+.content{display:grid;grid-template-columns:minmax(660px,1.65fr) minmax(350px,.85fr);gap:14px;min-height:0}
+.panel{border:1px solid var(--line);border-radius:24px;background:linear-gradient(180deg,rgba(9,24,40,.91),rgba(7,18,31,.94));box-shadow:var(--shadow);min-height:0;overflow:hidden}
+.menu-panel{display:grid;grid-template-rows:auto 1fr}
+.panelhead{display:flex;align-items:end;justify-content:space-between;gap:12px;padding:15px 17px 12px;border-bottom:1px solid var(--line)}
+.panelhead h2{font-size:15px;margin:0 0 2px;letter-spacing:.01em}
+.panelhead p{margin:0;color:var(--muted);font-size:12px;line-height:1.35}
+.progress{font-size:11px;color:#d5e5f3;border:1px solid var(--line);padding:6px 9px;border-radius:999px;background:rgba(255,255,255,.035)}
+.cards{padding:12px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-auto-rows:minmax(78px,1fr);gap:9px;min-height:0}
+.card{appearance:none;text-align:left;color:var(--ink);border:1px solid rgba(255,255,255,.105);border-radius:17px;background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.025));padding:11px 12px;cursor:pointer;position:relative;overflow:hidden;transition:.17s;min-width:0}
+.card::before{content:"";position:absolute;inset:0;background:linear-gradient(120deg,rgba(121,226,214,.10),transparent 42%,rgba(113,185,255,.07));opacity:0;transition:.17s}
+.card:hover{transform:translateY(-1px);border-color:rgba(121,226,214,.34)}
+.card:hover::before{opacity:1}
+.card.active{border-color:var(--line-strong);background:linear-gradient(160deg,rgba(31,104,110,.28),rgba(34,76,124,.24));box-shadow:inset 0 0 0 1px rgba(121,226,214,.11),0 8px 24px rgba(0,0,0,.15)}
+.card.active::before{opacity:1}
+.cardnum{position:relative;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--cyan);font-weight:850;margin-bottom:5px}
+.cardtitle{position:relative;font-size:13px;font-weight:780;line-height:1.25;padding-right:16px}
+.cardtag{position:relative;font-size:10.5px;color:var(--muted);line-height:1.25;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chev{position:absolute;right:10px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,.26);font-size:16px}
+.detail-panel{display:grid;grid-template-rows:auto 1fr}
+.detail{padding:20px;display:flex;flex-direction:column;min-height:0}
+.detailtop{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.subunit{font-size:10.5px;text-transform:uppercase;letter-spacing:.16em;color:var(--cyan);font-weight:850;margin-bottom:6px}
+.detail h3{font-size:clamp(1.45rem,2vw,2.05rem);line-height:1.05;margin:0;letter-spacing:-.02em}
+.corebadge{font-size:10px;text-transform:uppercase;letter-spacing:.12em;font-weight:850;color:#eaf8ff;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.055);padding:6px 8px;border-radius:999px;white-space:nowrap}
+.summary{font-size:14px;color:#d9e6f2;line-height:1.55;margin:12px 0 14px}
+.thermo-strip{height:9px;border-radius:999px;border:1px solid rgba(255,255,255,.08);background:linear-gradient(90deg,#60adff 0%,#8de2ee 26%,#f2f6fb 50%,#ffc56d 74%,#ff7968 100%);position:relative;margin-bottom:14px;overflow:hidden}
+.thermo-strip::after{content:"";position:absolute;left:var(--marker,50%);top:-4px;width:2px;height:16px;background:white;box-shadow:0 0 8px rgba(255,255,255,.65)}
+.infoblocks{display:grid;gap:9px;min-height:0}
+.info{border:1px solid rgba(255,255,255,.095);border-radius:15px;background:rgba(255,255,255,.032);padding:11px 12px}
+.label{font-size:9.5px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);font-weight:800;margin-bottom:5px}
+.info p{margin:0;font-size:12.5px;line-height:1.46;color:#e4edf6}
+.launchbox{margin-top:auto;padding-top:14px}
+.launch{display:flex;gap:9px}
+.launch a{flex:1;text-align:center}
+.launch a.sim{background:linear-gradient(135deg,#20897f,#2c6ca8);border-color:rgba(121,226,214,.4);font-size:14px;padding:12px}
+.guide{margin-top:9px;color:var(--muted);font-size:10.5px;line-height:1.4;text-align:center}
+.footer{display:flex;justify-content:space-between;align-items:center;gap:12px;color:#a9bdcf;font-size:11px;padding:0 5px 1px}
+.footer strong{color:#dce8f3;font-weight:720}
+@media (max-width:1120px){
+  body{overflow:auto}.app{min-height:100vh}.content{grid-template-columns:1fr}.cards{grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:82px}.detail{min-height:500px}
+}
+@media (max-width:720px){
+  .app{padding:10px;gap:10px}.topbar{border-radius:20px;padding:14px}.topgrid{grid-template-columns:1fr}.actions{justify-content:flex-start}.logo{width:58px;height:58px;flex-basis:58px}.cards{grid-template-columns:1fr;grid-auto-rows:auto}.card{min-height:75px}.content{grid-template-columns:1fr}.panel{border-radius:20px}.footer{align-items:flex-start;flex-direction:column}
+}
+@media (min-width:1121px) and (max-height:820px){
+  .app{padding:12px;gap:10px}.topbar{padding:13px 16px}.logo{width:58px;height:58px;flex-basis:58px}.logo svg{width:44px;height:44px}h1{font-size:2.35rem}.sub{font-size:12px;margin-top:5px}.cards{padding:9px;gap:7px;grid-auto-rows:minmax(67px,1fr)}.card{padding:8px 10px}.cardtitle{font-size:12px}.detail{padding:15px}.summary{font-size:12.5px;margin:9px 0 10px}.info{padding:9px 10px}.info p{font-size:11.5px}.launchbox{padding-top:9px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="topgrid">
+      <div class="brand">
+        <div class="logo" aria-hidden="true">
+          <svg viewBox="0 0 100 100">
+            <defs>
+              <linearGradient id="heat" x1="0" x2="1"><stop offset="0" stop-color="#71b9ff"/><stop offset=".52" stop-color="#f5f8fb"/><stop offset="1" stop-color="#ff816d"/></linearGradient>
+            </defs>
+            <rect x="12" y="14" width="76" height="57" rx="9" fill="none" stroke="rgba(255,255,255,.23)" stroke-width="2"/>
+            <circle cx="28" cy="35" r="4" fill="#71b9ff"/><circle cx="45" cy="48" r="3.5" fill="#79e2d6"/><circle cx="63" cy="31" r="4.2" fill="#ffc66d"/><circle cx="74" cy="54" r="3.8" fill="#ff816d"/><circle cx="33" cy="59" r="3" fill="#f3f8fd"/>
+            <path d="M12 80 C28 76,42 67,55 65 S76 54,88 39" fill="none" stroke="url(#heat)" stroke-width="4" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div>
+          <div class="eyebrow">AP Physics 2 · Unit 9 · Interactive Learning Suite</div>
+          <h1>Thermodynamics</h1>
+          <p class="sub">Explore the microscopic models, energy transfers, gas laws and thermodynamic processes behind Unit 9. Select a concept below, work through the matching workbook section, then consolidate with the questions provided.</p>
+        </div>
+      </div>
+      <nav class="actions" aria-label="Resources">
+        <a class="btn primary" href="AP_Physics_2_Unit_9_Student_Workbook.docx">Student Workbook</a>
+        <a class="btn" href="AP_Physics_2_Unit_9_Teacher_Key.docx">Teacher Key</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="content">
+    <section class="panel menu-panel">
+      <div class="panelhead">
+        <div><h2>Simulation Menu</h2><p>Choose a subunit to see its purpose and launch the activity.</p></div>
+        <div class="progress">14 simulations · one workbook</div>
+      </div>
+      <div class="cards" id="cards"></div>
+    </section>
+
+    <aside class="panel detail-panel">
+      <div class="panelhead">
+        <div><h2>Concept Focus</h2><p>Aligned to the corresponding worksheet section.</p></div>
+      </div>
+      <div class="detail" id="detail"></div>
+    </aside>
+  </main>
+
+  <footer class="footer">
+    <div><strong>© Pat Roby, 2026</strong></div>
+    <div>AP Physics 2 · Unit 9 Thermodynamics · Simulation & worksheet hub</div>
+  </footer>
+</div>
+<script>
+const workbook="AP_Physics_2_Unit_9_Student_Workbook.docx";
+const teacher="AP_Physics_2_Unit_9_Teacher_Key.docx";
+const concepts=[
+{n:"01",file:"01_Gas_Pressure_from_Collisions.html",title:"Gas Pressure from Collisions",tag:"Microscopic model of pressure",priority:"Core",marker:"24%",summary:"Explore how random molecular motion and collisions with container walls produce measurable gas pressure.",concept:"Pressure emerges from momentum transfer during countless particle-wall collisions. More frequent or more energetic collisions produce greater pressure.",sim:"Change the gas conditions and observe molecular motion, wall collisions and the pressure response.",work:"Workbook Section 01 guides prediction, observation and explanation using the collision model."},
+{n:"02",file:"02_Temperature_and_Molecular_KE.html",title:"Temperature & Molecular KE",tag:"Average kinetic energy",priority:"Core",marker:"69%",summary:"Relate temperature to the average translational kinetic energy of gas particles.",concept:"Higher temperature means greater average molecular kinetic energy. Individual particles still have a range of speeds.",sim:"Change temperature and watch particle motion and kinetic-energy measures respond.",work:"Workbook Section 02 focuses on separating temperature from the speed of any single particle."},
+{n:"03",file:"03_Molecular_Speed_Distributions.html",title:"Molecular Speed Distributions",tag:"Qualitative Maxwell–Boltzmann",priority:"Core",marker:"75%",summary:"Examine the range of molecular speeds and how the distribution changes with temperature.",concept:"Gas particles do not all move at one speed. Heating shifts the distribution toward larger speeds and makes it broader.",sim:"Compare particle motion with a live speed distribution at different temperatures.",work:"Workbook Section 03 develops qualitative interpretation of changing molecular-speed distributions."},
+{n:"04",file:"04_Ideal_Gas_Model.html",title:"Ideal Gas Model",tag:"State variables & assumptions",priority:"Core",marker:"50%",summary:"Connect the ideal-gas assumptions to pressure, volume, temperature and particle number.",concept:"The ideal-gas model treats particles as tiny, randomly moving objects with elastic collisions and negligible interactions except during collisions.",sim:"Manipulate P, V, T and N and observe the corresponding microscopic behaviour.",work:"Workbook Section 04 connects the model to PV = nRT and PV = NkBT."},
+{n:"05",file:"05_Gas_Law_Relationships_and_Graphs.html",title:"Gas Laws & Graphs",tag:"P–V, P–T and V–T",priority:"Core",marker:"55%",summary:"Build gas-law proportionalities from the ideal-gas model and interpret their graphs.",concept:"Boyle, Charles and Gay-Lussac relationships are different constrained cases of the same ideal-gas model.",sim:"Hold selected variables constant and watch P–V, P–T and V–T representations update.",work:"Workbook Section 05 emphasizes prediction, proportional reasoning and graph interpretation."},
+{n:"06",file:"06_Thermal_Equilibrium.html",title:"Thermal Equilibrium",tag:"Heat flow & equalisation",priority:"Core",marker:"50%",summary:"Explore energy transfer between systems at different temperatures until equilibrium is reached.",concept:"Thermal energy transfers spontaneously from higher-temperature to lower-temperature systems until both reach a common temperature.",sim:"Place two systems in thermal contact and observe their temperature and particle behaviour converge.",work:"Workbook Section 06 focuses on direction of heat transfer and equilibrium reasoning."},
+{n:"07",file:"07_Conduction_Convection_Radiation.html",title:"Conduction, Convection, Radiation",tag:"Transfer mechanisms",priority:"Support",marker:"58%",summary:"Compare the three principal mechanisms of thermal-energy transfer.",concept:"Conduction transfers energy through microscopic interactions, convection through bulk fluid motion, and radiation through electromagnetic waves.",sim:"Switch among transfer modes and compare what physically carries the energy.",work:"Workbook Section 07 applies the three mechanisms to physical situations."},
+{n:"08",file:"08_Internal_Energy.html",title:"Internal Energy",tag:"Microscopic energy",priority:"Core",marker:"64%",summary:"Distinguish temperature from internal energy and connect both to microscopic motion.",concept:"For a monatomic ideal gas, internal energy is the total microscopic kinetic energy and therefore depends only on temperature.",sim:"Track temperature, molecular kinetic energy and internal energy while changing the gas state.",work:"Workbook Section 08 develops the meaning and use of U = 3/2 nRT."},
+{n:"09",file:"09_First_Law_of_Thermodynamics.html",title:"First Law of Thermodynamics",tag:"ΔU = Q + W",priority:"Core",marker:"63%",summary:"Apply energy conservation to thermal systems using the AP Physics 2 sign convention.",concept:"Changes in internal energy are accounted for by energy transferred by heating and by work done on the system: ΔU = Q + W.",sim:"Add heat or do work and follow the energy accounting and system response.",work:"Workbook Section 09 emphasizes signs, system boundaries and energy bookkeeping."},
+{n:"10",file:"10_Work_and_PV_Diagrams.html",title:"Work & PV Diagrams",tag:"Area and process paths",priority:"Core",marker:"47%",summary:"Connect gas expansion and compression to work and to the geometry of PV diagrams.",concept:"A process path on a PV graph represents changing state variables; the area associated with the path is tied to mechanical work.",sim:"Move a piston, trace a PV path and observe the associated work region.",work:"Workbook Section 10 reinforces expansion/compression signs and graph interpretation."},
+{n:"11",file:"11_Thermodynamic_Processes.html",title:"Thermodynamic Processes",tag:"Four major process types",priority:"Core",marker:"52%",summary:"Compare isobaric, isochoric, isothermal and adiabatic processes.",concept:"Each process imposes a different constraint, producing characteristic relationships among P, V, T, Q, W and ΔU.",sim:"Choose a process type and explore its state-variable and energy changes.",work:"Workbook Section 11 provides side-by-side process comparisons and problem solving."},
+{n:"12",file:"12_Specific_Heat_and_Calorimetry.html",title:"Specific Heat & Calorimetry",tag:"Q = mcΔT",priority:"Support",marker:"61%",summary:"Compare how materials respond to energy transfer and analyse calorimetry situations.",concept:"Specific heat measures the energy required per unit mass for a given temperature change.",sim:"Heat or mix substances and compare their temperature changes and energy transfers.",work:"Workbook Section 12 combines conceptual comparisons with calorimetry calculations."},
+{n:"13",file:"13_Thermal_Conductivity.html",title:"Thermal Conductivity",tag:"Conduction rate",priority:"Support",marker:"43%",summary:"Explore how material and geometry affect the rate of conductive energy transfer.",concept:"Thermal conductivity is a material property; transfer rate also depends on area, thickness and temperature difference.",sim:"Vary material, area, length and temperature difference and compare conduction rates.",work:"Workbook Section 13 helps distinguish conductivity from specific heat."},
+{n:"14",file:"14_Entropy_and_Second_Law.html",title:"Entropy & the Second Law",tag:"Energy spreading",priority:"Core",marker:"50%",summary:"Develop a microscopic picture of why spontaneous processes move toward equilibrium.",concept:"Entropy is treated qualitatively as the statistical tendency for energy and particles to spread among available microscopic possibilities.",sim:"Allow particles or thermal energy to spread and observe why equilibrium states are overwhelmingly likely.",work:"Workbook Section 14 develops the qualitative AP treatment of entropy and irreversibility."}
+];
+let active=0;
+const cards=document.getElementById('cards');
+const detail=document.getElementById('detail');
+function renderCards(){
+ cards.innerHTML=concepts.map((c,i)=>`<button type="button" class="card ${i===active?'active':''}" data-i="${i}" aria-pressed="${i===active}"><div class="cardnum">Subunit ${c.n}</div><div class="cardtitle">${c.title}</div><div class="cardtag">${c.tag}</div><div class="chev">›</div></button>`).join('');
+ cards.querySelectorAll('.card').forEach(b=>b.addEventListener('click',()=>{active=Number(b.dataset.i);renderCards();renderDetail()}));
+}
+function renderDetail(){
+ const c=concepts[active];
+ detail.innerHTML=`
+  <div class="detailtop"><div><div class="subunit">Subunit ${c.n}</div><h3>${c.title}</h3></div><div class="corebadge">${c.priority}</div></div>
+  <p class="summary">${c.summary}</p>
+  <div class="thermo-strip" style="--marker:${c.marker}"></div>
+  <div class="infoblocks">
+    <div class="info"><div class="label">Concept being explored</div><p>${c.concept}</p></div>
+    <div class="info"><div class="label">In the simulation</div><p>${c.sim}</p></div>
+    <div class="info"><div class="label">Worksheet connection</div><p>${c.work}</p></div>
+  </div>
+  <div class="launchbox">
+    <div class="launch"><a class="btn sim" href="${c.file}">Launch Simulation ${c.n}</a><a class="btn" href="${workbook}">Workbook</a></div>
+    <div class="guide">Work through the matching worksheet section while using the simulation, then complete the post-simulation questions, notes, MCQs and FRQs.</div>
+  </div>`;
+}
+renderCards();renderDetail();
+</script>
+</body>
+</html>
