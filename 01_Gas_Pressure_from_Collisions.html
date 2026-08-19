@@ -1,0 +1,116 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>1. Gas Pressure from Collisions</title><style>
+:root{
+  --bg:#07111f; --panel:#0d1b2a; --panel2:#10243a; --ink:#edf6ff; --muted:#9db3c7;
+  --accent:#5de1d0; --accent2:#72a7ff; --warn:#ffcc66; --hot:#ff7b69; --cold:#73b7ff;
+  --line:rgba(255,255,255,.12); --shadow:0 18px 55px rgba(0,0,0,.32);
+}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;background:var(--bg);color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;overflow:hidden}
+body{background:radial-gradient(circle at 20% -10%,#153454 0,transparent 42%),linear-gradient(180deg,#07111f,#081625 55%,#07111f)}
+.app{height:100vh;display:grid;grid-template-rows:58px minmax(0,1fr)}
+header{display:flex;align-items:center;justify-content:space-between;padding:0 18px;border-bottom:1px solid var(--line);background:rgba(5,14,25,.78);backdrop-filter:blur(10px)}
+.brand{display:flex;align-items:center;gap:12px;min-width:0}.dot{width:11px;height:11px;border-radius:50%;background:var(--accent);box-shadow:0 0 18px var(--accent)}
+h1{font-size:18px;margin:0;font-weight:700;letter-spacing:.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.sub{font-size:12px;color:var(--muted);margin-left:10px;font-weight:500}
+header .actions{display:flex;gap:8px;align-items:center}
+button,select,input{font:inherit}
+button,.navbtn{border:1px solid var(--line);background:#132740;color:var(--ink);border-radius:10px;padding:8px 11px;cursor:pointer;transition:.15s;text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
+button:hover,.navbtn:hover{transform:translateY(-1px);border-color:rgba(93,225,208,.5)}button.primary,.navbtn.primary{background:linear-gradient(135deg,#16776d,#1b4f73);border-color:rgba(93,225,208,.45)}button.ghost,.navbtn.ghost{background:transparent}
+.main{min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:12px;padding:12px}
+.stage,.side{min-height:0;border:1px solid var(--line);border-radius:18px;background:linear-gradient(180deg,rgba(18,39,63,.96),rgba(10,25,42,.96));box-shadow:var(--shadow);overflow:hidden}
+.stage{position:relative;display:flex;min-width:0}.stage canvas{width:100%;height:100%;display:block}
+.side{padding:14px;overflow:auto;scrollbar-width:thin}.side h2{font-size:13px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin:2px 0 10px}.control{margin:11px 0 15px}.control label{display:flex;justify-content:space-between;gap:10px;font-size:13px;margin-bottom:6px}.control .value{color:var(--accent);font-variant-numeric:tabular-nums}.control input[type=range]{width:100%;accent-color:#5de1d0}.control select{width:100%;background:#10243a;color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:9px 10px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:8px}.row3{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.choice{padding:8px 5px}.choice.active{background:#1d5b6d;border-color:#58d7c8}
+.readouts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}.readout{padding:10px;border:1px solid var(--line);border-radius:12px;background:rgba(4,14,25,.38);min-width:0}.readout.wide{grid-column:1/-1}.readout .k{font-size:11px;color:var(--muted);line-height:1.25}.readout .v{font-size:17px;font-weight:750;margin-top:3px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}.readout .u{font-size:10px;color:var(--muted);margin-left:2px}
+.note{font-size:12px;line-height:1.45;color:#bed0df;border-left:3px solid rgba(93,225,208,.45);padding:8px 10px;background:rgba(93,225,208,.06);border-radius:0 10px 10px 0;margin-top:10px}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:11px}.tabs button.active{background:#1d5b6d;border-color:#58d7c8}
+.equation{font-family:"Cambria Math",Cambria,Georgia,serif;text-align:center;font-size:18px;padding:9px;border-radius:12px;background:rgba(0,0,0,.2);border:1px solid var(--line);margin:10px 0}
+.help{position:fixed;inset:70px 24px 24px;z-index:20;background:rgba(7,17,31,.96);border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:var(--shadow);display:none;overflow:auto}.help.show{display:block}.help h3{margin-top:0}.help p,.help li{color:#c6d7e5;line-height:1.55}.help .close{position:absolute;right:14px;top:14px}
+.small{font-size:11px;color:var(--muted)}
+@media(max-width:900px){html,body{overflow:auto}.app{height:auto;min-height:100vh}.main{grid-template-columns:1fr;grid-template-rows:62vh auto}.side{overflow:visible}.sub{display:none}}
+
+</style></head>
+<body><div class="app"><header><div class="brand"><span class="dot"></span><h1>1. Gas Pressure from Collisions<span class="sub">AP Physics 2 - Unit 9</span></h1></div><div class="actions"><a class="navbtn ghost" href="index.html">Home</a><button class="ghost" data-help>How to use</button><button id="resetBtn">Reset</button></div></header>
+<div class="main"><section class="stage"><canvas id="c"></canvas></section><aside class="side"><h2>Gas state</h2>
+<div class="control"><label>Temperature <span class="value" id="tOut"></span></label><input id="temp" type="range" min="150" max="600" value="300" step="10"></div>
+<div class="control"><label>Volume <span class="value" id="vOut"></span></label><input id="vol" type="range" min="1.5" max="5" value="4" step="0.1"></div>
+<div class="control"><label>Amount <span class="value" id="nOut"></span></label><input id="mol" type="range" min="0.03" max="0.14" value="0.08" step="0.01"></div>
+<div class="readouts">
+  <div class="readout"><div class="k">Pressure</div><div class="v" id="pRead">-</div></div>
+  <div class="readout"><div class="k">Actual particles, N</div><div class="v" id="NRead">-</div></div>
+  <div class="readout wide"><div class="k">Theoretical collisions with piston wall</div><div class="v" id="collRead">-</div></div>
+</div>
+<div class="row"><button id="pauseBtn" class="primary">Pause</button><button id="slowBtn">Slow motion</button></div>
+<div class="note">The moving dots are only a representative sample. The collision-rate readout is a <b>theoretical molecular rate</b>, calculated for an ideal N₂ gas striking a fixed-area piston (A = 0.0100 m²). It is therefore stable rather than a random count of the visible dots.</div></aside></div></div>
+<div class="help"><button class="close" data-close>Close</button><div class="content"></div></div>
+<script>
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+document.querySelectorAll('[id]').forEach(el=>{if(!(el.id in window)) window[el.id]=el;});
+const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
+const fmt=(x,d=1)=>Number(x).toFixed(d);
+function sci(x,sig=3){
+  if(!Number.isFinite(x)||x===0) return '0';
+  const e=Math.floor(Math.log10(Math.abs(x))), m=x/Math.pow(10,e);
+  return `${m.toPrecision(sig)} × 10^${e}`;
+}
+function setupCanvas(id='c'){
+ const c=document.getElementById(id),ctx=c.getContext('2d');
+ function resize(){const r=c.getBoundingClientRect(),d=window.devicePixelRatio||1;c.width=Math.round(r.width*d);c.height=Math.round(r.height*d);ctx.setTransform(d,0,0,d,0,0)}
+ window.addEventListener('resize',resize);resize();return [c,ctx];
+}
+function rounded(ctx,x,y,w,h,r){ctx.beginPath();ctx.roundRect(x,y,w,h,r)}
+function circle(ctx,x,y,r,fill){ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fillStyle=fill;ctx.fill()}
+function bindRange(id,out,fn){const el=document.getElementById(id),o=document.getElementById(out);const go=()=>{o.textContent=fn(+el.value)};el.addEventListener('input',go);go();return el}
+function helpText(html){document.querySelector('.help .content').innerHTML=html}
+document.addEventListener('click',e=>{if(e.target.matches('[data-help]'))document.querySelector('.help').classList.add('show');if(e.target.matches('[data-close]'))document.querySelector('.help').classList.remove('show')});
+
+
+helpText('<h3>Gas pressure from particle collisions</h3><p>Change temperature, volume and amount of gas. Before each change, predict whether pressure and collision rate will rise, fall or remain unchanged.</p><ul><li><b>Actual particles, N</b> is calculated from nN<sub>A</sub>.</li><li>The theoretical collision rate uses kinetic theory for an ideal N₂ gas striking the piston; the piston area is fixed at 0.0100 m².</li><li>The drawn particles are a tiny representative sample, so their visible impacts are not counted numerically.</li><li>Pause or use slow motion to inspect individual wall collisions.</li></ul>');
+const [c,ctx]=setupCanvas();
+const R=8.314462618, NA=6.02214076e23, M=0.0280134, A_PISTON=0.0100; // nitrogen, fixed piston area in m²
+let particles=[],paused=false,slow=false,last=performance.now();
+const temp=bindRange('temp','tOut',x=>x+' K'),vol=bindRange('vol','vOut',x=>fmt(x,1)+' L'),mol=bindRange('mol','nOut',x=>fmt(x,2)+' mol');
+function resetParticles(){
+  particles=[]; const count=Math.max(24,Math.round(+mol.value*700));
+  for(let i=0;i<count;i++){
+    const a=Math.random()*Math.PI*2, speed=70*(0.55+Math.random()*0.9);
+    particles.push({x:Math.random(),y:Math.random(),vx:Math.cos(a)*speed,vy:Math.sin(a)*speed});
+  }
+}
+mol.addEventListener('input',resetParticles);
+pauseBtn.onclick=()=>{paused=!paused;pauseBtn.textContent=paused?'Resume':'Pause'};
+slowBtn.onclick=()=>{slow=!slow;slowBtn.classList.toggle('primary',slow)};
+resetBtn.onclick=()=>{temp.value=300;vol.value=4;mol.value=.08;temp.dispatchEvent(new Event('input'));vol.dispatchEvent(new Event('input'));mol.dispatchEvent(new Event('input'));paused=false;slow=false;pauseBtn.textContent='Pause';slowBtn.classList.remove('primary');resetParticles()};
+function theory(){
+  const n=+mol.value, V_L=+vol.value, V=V_L/1000, T=+temp.value;
+  const P=n*R*T/V/1000;
+  const N=n*NA;
+  const meanSpeed=Math.sqrt(8*R*T/(Math.PI*M));
+  const collisionRate=(N/V)*meanSpeed*A_PISTON/4; // molecular flux n_number*vbar/4 times piston area
+  pRead.textContent=fmt(P,1)+' kPa';
+  NRead.textContent=sci(N,3);
+  collRead.textContent=sci(collisionRate,3)+' s⁻¹';
+}
+function draw(now){
+  let dt=Math.min(.035,(now-last)/1000); last=now; if(slow)dt*=.22;
+  const w=c.clientWidth,h=c.clientHeight;ctx.clearRect(0,0,w,h);
+  const pad=58, boxH=Math.min(h-118,420), boxY=(h-boxH)/2+10;
+  const boxW=(w-pad*2)*(+vol.value/5),boxX=pad;
+  ctx.fillStyle='rgba(4,12,22,.45)';rounded(ctx,boxX,boxY,boxW,boxH,16);ctx.fill();ctx.strokeStyle='rgba(255,255,255,.4)';ctx.lineWidth=2;ctx.stroke();
+  ctx.fillStyle='#a9c0d4';ctx.font='12px system-ui';ctx.fillText('movable piston',Math.max(boxX+8,boxX+boxW-76),boxY-13);ctx.fillStyle='#63809a';ctx.fillRect(boxX+boxW,boxY-9,14,boxH+18);
+  const speedScale=Math.sqrt(+temp.value/300), innerW=Math.max(40,boxW-16), innerH=Math.max(40,boxH-16);
+  if(!paused){
+    for(const p of particles){
+      p.x+=p.vx*speedScale*dt/innerW; p.y+=p.vy*speedScale*dt/innerH;
+      if(p.x<0){p.x=-p.x;p.vx*=-1} if(p.x>1){p.x=2-p.x;p.vx*=-1}
+      if(p.y<0){p.y=-p.y;p.vy*=-1} if(p.y>1){p.y=2-p.y;p.vy*=-1}
+    }
+  }
+  for(const p of particles)circle(ctx,boxX+8+p.x*innerW,boxY+8+p.y*innerH,3.1,'#8ee9dd');
+  theory();
+  ctx.fillStyle='#eaf4ff';ctx.font='700 24px system-ui';ctx.fillText('Pressure emerges from molecular wall collisions',pad,38);
+  ctx.font='13px system-ui';ctx.fillStyle='#9db3c7';ctx.fillText('The visible dots show the mechanism; the readouts use the real molecular scale.',pad,61);
+  ctx.fillStyle='rgba(255,204,102,.9)';ctx.font='12px system-ui';ctx.fillText(`${particles.length} representative dots shown`,pad,boxY+boxH+28);
+  requestAnimationFrame(draw);
+}
+resetParticles();requestAnimationFrame(draw);
+</script></body></html>
