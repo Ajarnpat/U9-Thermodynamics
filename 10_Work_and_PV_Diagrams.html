@@ -1,0 +1,61 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>10. Work & P-V Diagrams</title><style>
+:root{
+  --bg:#07111f; --panel:#0d1b2a; --panel2:#10243a; --ink:#edf6ff; --muted:#9db3c7;
+  --accent:#5de1d0; --accent2:#72a7ff; --warn:#ffcc66; --hot:#ff7b69; --cold:#73b7ff;
+  --line:rgba(255,255,255,.12); --shadow:0 18px 55px rgba(0,0,0,.32);
+}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;background:var(--bg);color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;overflow:hidden}
+body{background:radial-gradient(circle at 20% -10%,#153454 0,transparent 42%),linear-gradient(180deg,#07111f,#081625 55%,#07111f)}
+.app{height:100vh;display:grid;grid-template-rows:58px minmax(0,1fr)}
+header{display:flex;align-items:center;justify-content:space-between;padding:0 18px;border-bottom:1px solid var(--line);background:rgba(5,14,25,.78);backdrop-filter:blur(10px)}
+.brand{display:flex;align-items:center;gap:12px;min-width:0}.dot{width:11px;height:11px;border-radius:50%;background:var(--accent);box-shadow:0 0 18px var(--accent)}
+h1{font-size:18px;margin:0;font-weight:700;letter-spacing:.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.sub{font-size:12px;color:var(--muted);margin-left:10px;font-weight:500}
+header .actions{display:flex;gap:8px}
+button,select,input{font:inherit}
+button{border:1px solid var(--line);background:#132740;color:var(--ink);border-radius:10px;padding:8px 11px;cursor:pointer;transition:.15s}
+button:hover{transform:translateY(-1px);border-color:rgba(93,225,208,.5)}button.primary{background:linear-gradient(135deg,#16776d,#1b4f73);border-color:rgba(93,225,208,.45)}button.ghost{background:transparent}
+.main{min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:12px;padding:12px}
+.stage,.side{min-height:0;border:1px solid var(--line);border-radius:18px;background:linear-gradient(180deg,rgba(18,39,63,.96),rgba(10,25,42,.96));box-shadow:var(--shadow);overflow:hidden}
+.stage{position:relative;display:flex;min-width:0}.stage canvas{width:100%;height:100%;display:block}
+.side{padding:14px;overflow:auto;scrollbar-width:thin}.side h2{font-size:13px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin:2px 0 10px}.control{margin:11px 0 15px}.control label{display:flex;justify-content:space-between;gap:10px;font-size:13px;margin-bottom:6px}.control .value{color:var(--accent);font-variant-numeric:tabular-nums}.control input[type=range]{width:100%;accent-color:#5de1d0}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:8px}.row3{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.readouts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}.readout{padding:10px;border:1px solid var(--line);border-radius:12px;background:rgba(4,14,25,.38)}.readout .k{font-size:11px;color:var(--muted)}.readout .v{font-size:18px;font-weight:750;margin-top:2px;font-variant-numeric:tabular-nums}.readout .u{font-size:10px;color:var(--muted);margin-left:2px}
+.note{font-size:12px;line-height:1.45;color:#bed0df;border-left:3px solid rgba(93,225,208,.45);padding:8px 10px;background:rgba(93,225,208,.06);border-radius:0 10px 10px 0;margin-top:10px}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:11px}.tabs button.active{background:#1d5b6d;border-color:#58d7c8}
+.equation{font-family:"Cambria Math",Cambria,Georgia,serif;text-align:center;font-size:18px;padding:9px;border-radius:12px;background:rgba(0,0,0,.2);border:1px solid var(--line);margin:10px 0}
+.legend{position:absolute;left:14px;bottom:12px;display:flex;gap:10px;flex-wrap:wrap;font-size:11px;color:#c7d6e3;background:rgba(4,12,22,.62);border:1px solid var(--line);border-radius:10px;padding:7px 9px;backdrop-filter:blur(6px)}
+.pill{display:inline-flex;align-items:center;gap:6px}.sw{width:8px;height:8px;border-radius:50%}
+.help{position:fixed;inset:70px 24px 24px;z-index:20;background:rgba(7,17,31,.96);border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:var(--shadow);display:none;overflow:auto}.help.show{display:block}.help h3{margin-top:0}.help p,.help li{color:#c6d7e5;line-height:1.55}.help .close{position:absolute;right:14px;top:14px}
+.small{font-size:11px;color:var(--muted)}
+@media(max-width:900px){html,body{overflow:auto}.app{height:auto;min-height:100vh}.main{grid-template-columns:1fr;grid-template-rows:62vh auto}.side{overflow:visible}.sub{display:none}}
+</style></head>
+<body><div class="app"><header><div class="brand"><span class="dot"></span><h1>10. Work & P-V Diagrams<span class="sub">AP Physics 2 - Unit 9</span></h1></div><div class="actions"><button class="ghost" onclick="location.href='index.html'">Home</button><button class="ghost" data-help>How to use</button><button id="resetBtn">Reset</button></div></header>
+<div class="main"><section class="stage"><canvas id="c"></canvas></section><aside class="side"><h2>Constant external pressure</h2><div class="control"><label>External pressure <span class="value" id="pOut"></span></label><input id="press" type="range" min="50" max="200" value="100" step="5"></div><div class="control"><label>Final volume <span class="value" id="vOut"></span></label><input id="vol" type="range" min="1.5" max="6.5" value="4" step="0.1"></div><div class="readouts"><div class="readout"><div class="k">Start volume</div><div class="v" id="startRead">4.0 L</div></div><div class="readout"><div class="k">ΔV</div><div class="v" id="dvRead">-</div></div><div class="readout"><div class="k">Work on gas</div><div class="v" id="wRead">-</div></div><div class="readout"><div class="k">Shaded area |PΔV|</div><div class="v" id="areaRead">-</div></div></div><div class="row"><button id="setStart" class="primary">Set current as start</button><button id="zero">Return to 4.0 L</button></div><div class="equation">W<sub>on</sub> = -P<sub>ext</sub>ΔV</div><div class="note">Idealized constant-external-pressure process. Start = teal point; current/final = yellow point. The arrow shows process direction. Since 1 kPa·L = 1 J, the graph area directly gives work magnitude in joules.</div></aside></div></div>
+<div class="help"><button class="close" data-close>Close</button><div class="content"></div></div>
+<script>
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+document.querySelectorAll('[id]').forEach(el=>{if(!(el.id in window)) window[el.id]=el;});
+const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
+const lerp=(a,b,t)=>a+(b-a)*t;
+const fmt=(x,d=1)=>Number(x).toFixed(d);
+function setupCanvas(id='c'){
+ const c=document.getElementById(id),ctx=c.getContext('2d');
+ function resize(){const r=c.getBoundingClientRect(),d=window.devicePixelRatio||1;c.width=Math.round(r.width*d);c.height=Math.round(r.height*d);ctx.setTransform(d,0,0,d,0,0)}
+ window.addEventListener('resize',resize);resize();return [c,ctx];
+}
+function rounded(ctx,x,y,w,h,r){ctx.beginPath();ctx.roundRect(x,y,w,h,r)}
+function grid(ctx,x,y,w,h,nx=6,ny=5){ctx.save();ctx.strokeStyle='rgba(255,255,255,.08)';ctx.lineWidth=1;for(let i=0;i<=nx;i++){let xx=x+w*i/nx;ctx.beginPath();ctx.moveTo(xx,y);ctx.lineTo(xx,y+h);ctx.stroke()}for(let j=0;j<=ny;j++){let yy=y+h*j/ny;ctx.beginPath();ctx.moveTo(x,yy);ctx.lineTo(x+w,yy);ctx.stroke()}ctx.restore()}
+function circle(ctx,x,y,r,fill){ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fillStyle=fill;ctx.fill()}
+function bindRange(id,out,fn){const el=document.getElementById(id),o=document.getElementById(out);const go=()=>{o.textContent=fn(+el.value)};el.addEventListener('input',go);go();return el}
+function helpText(html){document.querySelector('.help .content').innerHTML=html}
+document.addEventListener('click',e=>{if(e.target.matches('[data-help]'))document.querySelector('.help').classList.add('show');if(e.target.matches('[data-close]'))document.querySelector('.help').classList.remove('show')});
+
+helpText('<h3>Work and P-V diagrams</h3><p>Choose an external pressure, set a starting volume, then move to a final volume. Compare piston direction, ΔV, W<sub>on</sub>, and the shaded P-V area. The teal point is the start and the yellow point is the current/final state.</p><p>This is an idealized constant-external-pressure (quasistatic-style) model, so the horizontal P-V path is the relevant work path.</p>');
+const [c,ctx]=setupCanvas();let V0=4;const press=bindRange('press','pOut',x=>x+' kPa'),vol=bindRange('vol','vOut',x=>fmt(x,1)+' L');setStart.onclick=()=>{V0=+vol.value};zero.onclick=()=>{vol.value=4;vol.dispatchEvent(new Event('input'))};resetBtn.onclick=()=>{V0=4;press.value=100;vol.value=4;press.dispatchEvent(new Event('input'));vol.dispatchEvent(new Event('input'))};
+function drawGraphAxes(ctx,x,y,w,h){grid(ctx,x,y,w,h,6,4);ctx.strokeStyle='rgba(255,255,255,.35)';ctx.beginPath();ctx.moveTo(x,y+h);ctx.lineTo(x+w,y+h);ctx.moveTo(x,y);ctx.lineTo(x,y+h);ctx.stroke();ctx.fillStyle='#9db3c7';ctx.font='11px system-ui';[1,2,3,4,5,6,7].forEach(V=>ctx.fillText(V,x+(V-1)/6*w-3,y+h+16));[0,50,100,150,200].forEach(P=>ctx.fillText(P,x-28,y+h-P/220*h+4));ctx.fillText('V (L)',x+w-28,y+h-8);ctx.save();ctx.translate(x+9,y+50);ctx.rotate(-Math.PI/2);ctx.fillText('P (kPa)',0,0);ctx.restore()}
+function arrow(ctx,x1,y1,x2,y2){if(Math.abs(x2-x1)<6)return;let dir=Math.sign(x2-x1),xm=(x1+x2)/2;ctx.fillStyle='#ffcc66';ctx.beginPath();ctx.moveTo(xm+dir*9,y2);ctx.lineTo(xm-dir*5,y2-6);ctx.lineTo(xm-dir*5,y2+6);ctx.closePath();ctx.fill()}
+function frame(){let w=c.clientWidth,h=c.clientHeight;ctx.clearRect(0,0,w,h);let V=+vol.value,P=+press.value,dV=V-V0,W=-P*dV;let bx=45,by=90,bw=w*.43,bh=h-160,maxPW=bw*(6.5/7),pistonW=bw*(V/7),startPW=bw*(V0/7);rounded(ctx,bx,by,maxPW,bh,16);ctx.fillStyle='rgba(4,12,22,.26)';ctx.fill();ctx.strokeStyle='rgba(255,255,255,.22)';ctx.stroke();ctx.fillStyle='rgba(93,225,208,.15)';ctx.fillRect(bx,by,Math.min(pistonW,maxPW),bh);ctx.strokeStyle='rgba(93,225,208,.55)';ctx.setLineDash([5,5]);ctx.beginPath();ctx.moveTo(bx+startPW,by);ctx.lineTo(bx+startPW,by+bh);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle='#63809a';ctx.fillRect(bx+pistonW,by-8,14,bh+16);ctx.fillStyle='#ffcc66';ctx.font='14px system-ui';ctx.fillText(P+' kPa external pressure',bx+10,by+28);ctx.fillStyle='#9db3c7';ctx.font='12px system-ui';ctx.fillText('start',bx+startPW-12,by+bh+18);if(Math.abs(dV)>.02){ctx.fillStyle='#ffcc66';ctx.font='700 22px system-ui';ctx.fillText(dV>0?'→ expansion':'← compression',bx+10,by+bh-18)}
+ let gx=w*.56,gy=90,gw=w*.38,gh=h-160;drawGraphAxes(ctx,gx,gy,gw,gh);let x1=gx+(V0-1)/6*gw,x2=gx+(V-1)/6*gw,yy=gy+gh-P/220*gh;ctx.fillStyle='rgba(93,225,208,.20)';ctx.fillRect(Math.min(x1,x2),yy,Math.abs(x2-x1),gy+gh-yy);ctx.strokeStyle='#5de1d0';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(x1,yy);ctx.lineTo(x2,yy);ctx.stroke();arrow(ctx,x1,yy,x2,yy);ctx.font='11px system-ui';if(Math.abs(dV)<.02){circle(ctx,x1,yy,7,'#5de1d0');circle(ctx,x1,yy,4,'#ffcc66');ctx.fillStyle='#cfe9e5';ctx.fillText('start = current',x1-34,yy-12)}else{circle(ctx,x1,yy,6,'#5de1d0');circle(ctx,x2,yy,6,'#ffcc66');ctx.fillStyle='#5de1d0';ctx.fillText('start',x1-15,yy-10);ctx.fillStyle='#ffcc66';ctx.fillText('final',x2-12,yy+18)};
+ startRead.textContent=fmt(V0,1)+' L';dvRead.textContent=(dV>=0?'+':'')+fmt(dV,1)+' L';wRead.textContent=(W>=0?'+':'')+fmt(W,0)+' J';areaRead.textContent=fmt(Math.abs(P*dV),0)+' J';ctx.fillStyle='#edf6ff';ctx.font='700 24px system-ui';ctx.fillText('Work from a P-V diagram',45,44);requestAnimationFrame(frame)}requestAnimationFrame(frame);
+</script></body></html>

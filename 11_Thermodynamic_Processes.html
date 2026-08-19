@@ -1,0 +1,66 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>11. Thermodynamic Processes</title><style>
+:root{
+  --bg:#07111f; --panel:#0d1b2a; --panel2:#10243a; --ink:#edf6ff; --muted:#9db3c7;
+  --accent:#5de1d0; --accent2:#72a7ff; --warn:#ffcc66; --hot:#ff7b69; --cold:#73b7ff;
+  --line:rgba(255,255,255,.12); --shadow:0 18px 55px rgba(0,0,0,.32);
+}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;background:var(--bg);color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;overflow:hidden}
+body{background:radial-gradient(circle at 20% -10%,#153454 0,transparent 42%),linear-gradient(180deg,#07111f,#081625 55%,#07111f)}
+.app{height:100vh;display:grid;grid-template-rows:58px minmax(0,1fr)}
+header{display:flex;align-items:center;justify-content:space-between;padding:0 18px;border-bottom:1px solid var(--line);background:rgba(5,14,25,.78);backdrop-filter:blur(10px)}
+.brand{display:flex;align-items:center;gap:12px;min-width:0}.dot{width:11px;height:11px;border-radius:50%;background:var(--accent);box-shadow:0 0 18px var(--accent)}
+h1{font-size:18px;margin:0;font-weight:700;letter-spacing:.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.sub{font-size:12px;color:var(--muted);margin-left:10px;font-weight:500}
+header .actions{display:flex;gap:8px}
+button,select,input{font:inherit}
+button{border:1px solid var(--line);background:#132740;color:var(--ink);border-radius:10px;padding:8px 11px;cursor:pointer;transition:.15s}
+button:hover{transform:translateY(-1px);border-color:rgba(93,225,208,.5)}button.primary{background:linear-gradient(135deg,#16776d,#1b4f73);border-color:rgba(93,225,208,.45)}button.ghost{background:transparent}
+.main{min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:12px;padding:12px}
+.stage,.side{min-height:0;border:1px solid var(--line);border-radius:18px;background:linear-gradient(180deg,rgba(18,39,63,.96),rgba(10,25,42,.96));box-shadow:var(--shadow);overflow:hidden}
+.stage{position:relative;display:flex;min-width:0}.stage canvas{width:100%;height:100%;display:block}
+.side{padding:14px;overflow:auto;scrollbar-width:thin}.side h2{font-size:13px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin:2px 0 10px}.control{margin:11px 0 15px}.control label{display:flex;justify-content:space-between;gap:10px;font-size:13px;margin-bottom:6px}.control .value{color:var(--accent);font-variant-numeric:tabular-nums}.control input[type=range]{width:100%;accent-color:#5de1d0}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:8px}.row3{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.readouts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}.readout{padding:10px;border:1px solid var(--line);border-radius:12px;background:rgba(4,14,25,.38)}.readout .k{font-size:11px;color:var(--muted)}.readout .v{font-size:18px;font-weight:750;margin-top:2px;font-variant-numeric:tabular-nums}.readout .u{font-size:10px;color:var(--muted);margin-left:2px}
+.note{font-size:12px;line-height:1.45;color:#bed0df;border-left:3px solid rgba(93,225,208,.45);padding:8px 10px;background:rgba(93,225,208,.06);border-radius:0 10px 10px 0;margin-top:10px}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:11px}.tabs button.active{background:#1d5b6d;border-color:#58d7c8}
+.equation{font-family:"Cambria Math",Cambria,Georgia,serif;text-align:center;font-size:18px;padding:9px;border-radius:12px;background:rgba(0,0,0,.2);border:1px solid var(--line);margin:10px 0}
+.legend{position:absolute;left:14px;bottom:12px;display:flex;gap:10px;flex-wrap:wrap;font-size:11px;color:#c7d6e3;background:rgba(4,12,22,.62);border:1px solid var(--line);border-radius:10px;padding:7px 9px;backdrop-filter:blur(6px)}
+.pill{display:inline-flex;align-items:center;gap:6px}.sw{width:8px;height:8px;border-radius:50%}
+.help{position:fixed;inset:70px 24px 24px;z-index:20;background:rgba(7,17,31,.96);border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:var(--shadow);display:none;overflow:auto}.help.show{display:block}.help h3{margin-top:0}.help p,.help li{color:#c6d7e5;line-height:1.55}.help .close{position:absolute;right:14px;top:14px}
+.small{font-size:11px;color:var(--muted)}
+@media(max-width:900px){html,body{overflow:auto}.app{height:auto;min-height:100vh}.main{grid-template-columns:1fr;grid-template-rows:62vh auto}.side{overflow:visible}.sub{display:none}}
+</style></head>
+<body><div class="app"><header><div class="brand"><span class="dot"></span><h1>11. Thermodynamic Processes<span class="sub">AP Physics 2 - Unit 9</span></h1></div><div class="actions"><button class="ghost" onclick="location.href='index.html'">Home</button><button class="ghost" data-help>How to use</button><button id="resetBtn">Reset</button></div></header>
+<div class="main"><section class="stage"><canvas id="c"></canvas></section><aside class="side"><h2>Process</h2><div class="tabs"><button class="active" data-proc="isoP">Isobaric</button><button data-proc="isoV">Isochoric</button><button data-proc="isoT">Isothermal</button><button data-proc="adia">Adiabatic</button></div><div class="equation" id="constraint">P = constant</div><div class="control"><label id="driveLabel">Final volume <span class="value" id="driveOut"></span></label><input id="drive" type="range" min="2" max="6" value="4" step="0.1"></div><div class="readouts"><div class="readout"><div class="k">P</div><div class="v" id="pRead">-</div></div><div class="readout"><div class="k">V</div><div class="v" id="vRead">-</div></div><div class="readout"><div class="k">T</div><div class="v" id="tRead">-</div></div><div class="readout"><div class="k">Q / W / ΔU</div><div class="v" id="eRead" style="font-size:13px">-</div></div></div><button id="setStart" class="primary" style="width:100%">Return to common starting state</button><div class="note" id="procNote">All four processes begin at P=100 kPa and V=4.0 L, so their paths can be compared directly.</div></aside></div></div>
+<div class="help"><button class="close" data-close>Close</button><div class="content"></div></div>
+<script>
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+document.querySelectorAll('[id]').forEach(el=>{if(!(el.id in window)) window[el.id]=el;});
+const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
+const lerp=(a,b,t)=>a+(b-a)*t;
+const fmt=(x,d=1)=>Number(x).toFixed(d);
+function setupCanvas(id='c'){
+ const c=document.getElementById(id),ctx=c.getContext('2d');
+ function resize(){const r=c.getBoundingClientRect(),d=window.devicePixelRatio||1;c.width=Math.round(r.width*d);c.height=Math.round(r.height*d);ctx.setTransform(d,0,0,d,0,0)}
+ window.addEventListener('resize',resize);resize();return [c,ctx];
+}
+function rounded(ctx,x,y,w,h,r){ctx.beginPath();ctx.roundRect(x,y,w,h,r)}
+function grid(ctx,x,y,w,h,nx=6,ny=5){ctx.save();ctx.strokeStyle='rgba(255,255,255,.08)';ctx.lineWidth=1;for(let i=0;i<=nx;i++){let xx=x+w*i/nx;ctx.beginPath();ctx.moveTo(xx,y);ctx.lineTo(xx,y+h);ctx.stroke()}for(let j=0;j<=ny;j++){let yy=y+h*j/ny;ctx.beginPath();ctx.moveTo(x,yy);ctx.lineTo(x+w,yy);ctx.stroke()}ctx.restore()}
+function circle(ctx,x,y,r,fill){ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fillStyle=fill;ctx.fill()}
+function bindRange(id,out,fn){const el=document.getElementById(id),o=document.getElementById(out);const go=()=>{o.textContent=fn(+el.value)};el.addEventListener('input',go);go();return el}
+function helpText(html){document.querySelector('.help .content').innerHTML=html}
+document.addEventListener('click',e=>{if(e.target.matches('[data-help]'))document.querySelector('.help').classList.add('show');if(e.target.matches('[data-close]'))document.querySelector('.help').classList.remove('show')});
+
+helpText('<h3>Thermodynamic processes</h3><p>All four modes use the same initial state: P=100 kPa, V=4.0 L. The highlighted constraint tells you what is held fixed. Compare the resulting P-V paths and Q, W, ΔU values.</p><p>Teal marks the common starting state; yellow marks the current state.</p>');
+const [c,ctx]=setupCanvas();const n=.2,R=8.314,gamma=5/3,Cv=1.5*n*R;let proc='isoP',P0=100,V0=4,T0=P0*1000*(V0/1000)/(n*R);const drive=$('#drive');
+const meta={isoP:['P = constant','Isobaric: pressure stays fixed while volume and temperature can change.'],isoV:['V = constant','Isochoric: volume stays fixed, so W = 0.'],isoT:['T = constant','Isothermal ideal gas: ΔU = 0, so Q = −W.'],adia:['Q = 0','Adiabatic: no energy is transferred by heating; expansion cools the gas.']};
+function updateDrive(){if(proc==='isoV'){driveLabel.firstChild.textContent='Final temperature ';drive.min=180;drive.max=650;drive.step=10;driveOut.textContent=Math.round(+drive.value)+' K'}else{driveLabel.firstChild.textContent='Final volume ';drive.min=2;drive.max=6;drive.step=.1;driveOut.textContent=fmt(+drive.value,1)+' L'}constraint.textContent=meta[proc][0];procNote.textContent=meta[proc][1]+' Common start: 100 kPa, 4.0 L.'}
+function start(){P0=100;V0=4;T0=P0*1000*(V0/1000)/(n*R);drive.value=proc==='isoV'?T0:V0;updateDrive()}
+$$('[data-proc]').forEach(b=>b.onclick=()=>{$$('[data-proc]').forEach(x=>x.classList.remove('active'));b.classList.add('active');proc=b.dataset.proc;start()});drive.oninput=updateDrive;setStart.onclick=start;resetBtn.onclick=()=>{proc='isoP';$$('[data-proc]').forEach((b,i)=>b.classList.toggle('active',i===0));start()};
+function state(){let P,V,T,Q,W,dU;if(proc==='isoP'){P=P0;V=+drive.value;T=T0*V/V0;W=-P*(V-V0);dU=Cv*(T-T0);Q=dU-W}else if(proc==='isoV'){V=V0;T=+drive.value;P=P0*T/T0;W=0;dU=Cv*(T-T0);Q=dU}else if(proc==='isoT'){T=T0;V=+drive.value;P=P0*V0/V;W=-(n*R*T)*Math.log(V/V0);dU=0;Q=-W}else{V=+drive.value;T=T0*Math.pow(V0/V,gamma-1);P=P0*Math.pow(V0/V,gamma);dU=Cv*(T-T0);W=dU;Q=0}return {P,V,T,Q,W,dU}}
+function graphAxes(ctx,x,y,w,h){grid(ctx,x,y,w,h,4,4);ctx.strokeStyle='rgba(255,255,255,.35)';ctx.beginPath();ctx.moveTo(x,y+h);ctx.lineTo(x+w,y+h);ctx.moveTo(x,y);ctx.lineTo(x,y+h);ctx.stroke();ctx.fillStyle='#9db3c7';ctx.font='11px system-ui';[2,3,4,5,6].forEach(V=>ctx.fillText(V,x+(V-2)/4*w-3,y+h+16));[50,100,200,300].forEach(P=>ctx.fillText(P,x-28,y+h-(P-30)/320*h+4));ctx.fillText('V (L)',x+w-28,y+h-8);ctx.save();ctx.translate(x+9,y+50);ctx.rotate(-Math.PI/2);ctx.fillText('P (kPa)',0,0);ctx.restore()}
+function frame(){let s=state(),w=c.clientWidth,h=c.clientHeight;ctx.clearRect(0,0,w,h);let bx=45,by=90,bh=h-160,bw=w*.40*(s.V/6);rounded(ctx,bx,by,bw,bh,16);ctx.fillStyle='rgba(4,12,22,.45)';ctx.fill();ctx.strokeStyle='rgba(255,255,255,.3)';ctx.stroke();ctx.fillStyle='#63809a';ctx.fillRect(bx+bw,by-8,14,bh+16);ctx.fillStyle='#edf6ff';ctx.font='700 24px system-ui';ctx.fillText('Thermodynamic process comparison',45,44);ctx.fillStyle='#9db3c7';ctx.font='12px system-ui';ctx.fillText(meta[proc][0]+'   |   common start: 100 kPa, 4.0 L, '+Math.round(T0)+' K',45,66);
+ let gx=w*.54,gy=90,gw=w*.40,gh=h-160;graphAxes(ctx,gx,gy,gw,gh);let curve=[];if(proc==='isoV')curve=[[V0,40],[V0,340]];else for(let V=2;V<=6;V+=.04){let P=proc==='isoP'?P0:proc==='isoT'?P0*V0/V:P0*Math.pow(V0/V,gamma);curve.push([V,P])};ctx.strokeStyle='#5de1d0';ctx.lineWidth=2.7;ctx.beginPath();curve.forEach((p,i)=>{let xx=gx+(p[0]-2)/4*gw,yy=gy+gh-(p[1]-30)/320*gh;i?ctx.lineTo(xx,yy):ctx.moveTo(xx,yy)});ctx.stroke();let sx=gx+(V0-2)/4*gw,sy=gy+gh-(P0-30)/320*gh;let cx=gx+(s.V-2)/4*gw,cy=gy+gh-(s.P-30)/320*gh;ctx.font='11px system-ui';if(Math.abs(s.V-V0)<.001&&Math.abs(s.P-P0)<.01){circle(ctx,sx,sy,7,'#5de1d0');circle(ctx,sx,sy,4,'#ffcc66');ctx.fillStyle='#cfe9e5';ctx.fillText('start = current',sx-34,sy-10)}else{circle(ctx,sx,sy,6,'#5de1d0');circle(ctx,cx,cy,6,'#ffcc66');ctx.fillStyle='#5de1d0';ctx.fillText('start',sx-14,sy-10)};
+ pRead.textContent=fmt(s.P,1)+' kPa';vRead.textContent=fmt(s.V,2)+' L';tRead.textContent=Math.round(s.T)+' K';eRead.textContent=`Q ${s.Q>=0?'+':''}${Math.round(s.Q)} J | W ${s.W>=0?'+':''}${Math.round(s.W)} J | ΔU ${s.dU>=0?'+':''}${Math.round(s.dU)} J`;requestAnimationFrame(frame)}
+start();requestAnimationFrame(frame);
+</script></body></html>
